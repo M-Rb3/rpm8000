@@ -10,12 +10,13 @@ import {
   DataLabel,
 } from "@syncfusion/ej2-react-charts";
 import React, { useState, useEffect } from "react";
-import { sampleData } from "./data";
+import { sampleData2 } from "./data";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles/app.scss";
 import { Button, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import logo from "./images/logo.jpeg";
+// import data
 
 function App() {
   const [data, setData] = useState([]);
@@ -35,28 +36,45 @@ function App() {
   };
   useEffect(() => {}, [update]);
   const submitHandler = () => {
-    let i = 0;
-    let t = 1;
     const url = active
       ? "http://127.0.0.1:5000/"
       : "http://127.0.0.1:5000/chart";
     axios.get(url).then((response) => {
+      console.log(response.data.data);
       const newData = response.data.data.map((e, idx) => ({
         x: (idx / response.data.data.length) * 360,
         y: e,
       }));
       console.log(newData);
-      newData.map(() => {
-        setTimeout(() => {
-          setData(newData.slice(0, i + 1));
-          i = i + 1;
-        }, t * 1000);
-        t = t + 0.3;
-        return data;
-      });
+      setData(newData);
     });
   };
+  // useEffect(() => {}, [update]);
+  // const submitHandler = () => {
 
+  //   const url = active
+  //     ? "http://127.0.0.1:5000/"
+  //     : "http://127.0.0.1:5000/chart";
+  //   axios.get(url).then((response) => {
+  //     console.log(response.data.data);
+  //     const newData = response.data.data.map((e, idx) => ({
+  //       x: (idx / response.data.data.length) * 360,
+  //       y: e,
+  //     }));
+  //     console.log(newData);
+  //     setData(newData);
+  //   });
+  // };
+  // let i = 0;
+  // let t = 1;
+  // newData.map(() => {
+  //   setTimeout(() => {
+  //     setData(newData.slice(0, i + 1));
+  //     i = i + 1;
+  //   }, t * 1000);
+  //   t = t + 0.3;
+  //   return data;
+  // });
   return (
     <Row>
       <Col className="content" xs={6}>

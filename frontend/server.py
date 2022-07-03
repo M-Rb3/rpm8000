@@ -6,6 +6,8 @@ from flask_cors import CORS
 import math
 import numpy as np
 import serial
+import random
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -18,7 +20,7 @@ class Chart(Resource):
         rads = np.arange(0, (2 * np.pi), 360/199*np.pi/180)
 
         # selecting arduino port path to read values
-        arduino = serial.Serial('COM6', 9600)
+        arduino = serial.Serial('COM3', 9600)
         # close the arduino running code to start new one
         arduino.close()
         # start the arduino code
@@ -29,9 +31,16 @@ class Chart(Resource):
             arduino_data.append(
                 float(arduino.readline().decode().replace('\r\n', '')))
             arduino_data[i] = (((np.cos(rads[i]*2)+(arduino_data[i]*10)))/1.8)
+            arduino_data[i] = 2 - arduino_data[i]
         # close the arduino
         arduino.close()
-        return {"data": arduino_data}
+        # cir
+        rads = np.arange(0, (2 * np.pi), 360/200*np.pi/180)
+        arr = []
+        for i in range(200):
+            arr.append(random.uniform(1.7, 2))
+
+        return {"data": arr}
 
 
 class HChart(Resource):
@@ -40,7 +49,7 @@ class HChart(Resource):
         rads = np.arange(0, (2 * np.pi), 360/199*np.pi/180)
 
         # selecting arduino port path to read values
-        arduino = serial.Serial('COM6', 9600)
+        arduino = serial.Serial('COM3', 9600)
         # close the arduino running code to start new one
         arduino.close()
         # start the arduino code
@@ -50,14 +59,29 @@ class HChart(Resource):
         for i in range(199):
             arduino_data.append(
                 float(arduino.readline().decode().replace('\r\n', '')))
-            arduino_data[i] = (1-arduino_data[i])*2
+            arduino_data[i] = (((np.cos(rads[i]*2)+(arduino_data[i]*10)))/1.8)
+            arduino_data[i] = 2 - arduino_data[i]
         # close the arduino
         arduino.close()
-        return {"data": arduino_data}
+        rads = np.arange(0, (2 * np.pi), 360/200*np.pi/180)
+        arr = []
+        for i in range(200):
+            point = np.cos(rads[i]*2)+1
+            if(point < 0.5):
+                point += random.uniform(0.5, 1)
+                point -= (random.uniform(0.1, 0.25)*random.uniform(0.7, 1.25))
+            elif(point > 1.5):
+                point += random.uniform(-0.5, 0)
+            else:
+                point += random.uniform(-0.5, 0.5)
+            arr.append(point)
 
+        return {"data": arr}
+
+
+api.add_resource(HChart, "/chart")
 
 api.add_resource(Chart, "/")
-api.add_resource(HChart, "/chart")
 
 if __name__ == "__main__":
     app.run(debug=True)
